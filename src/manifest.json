@@ -1,29 +1,28 @@
 {
 	"manifest_version" : 2,
-	"name" : "Sort tabs advanced",
+	"name" : "FrequencyWeave Tabs",
 	"version" : "0.2",
-	"author" : "Mois Moshev <mois@monomon.me>",
+	"author" : "kpuc <chris@ciar.org>",
 	"icons" : {
 		"48" : "icons/sortabs-48.png"
 	},
-	"description" : "Sort tabs by various criteria",
+	"description" : "Redistribute tabs by frequency of domain name",
 	"browser_action" : {
 		"default_icon" : {
 			"16" : "icons/sortabs-16.png",
 			"24" : "icons/sortabs-24.png",
 			"48" : "icons/sortabs-48.png"
 		},
-		"default_title" : "Sort tabs advanced",
+		"default_title" : "FrequencyWeave",
 		"default_popup" : "popup/picker.html",
 		"browser_style" : true
 	},
 	"permissions" : [
-		"tabs",
-    "storage"
+		  "tabs"
 	],
   "browser_specific_settings": {
     "gecko": {
-      "id": "{d6f02b92-88b3-4aa5-ba7c-14519042171d}"
+      "id": "FrequencyWeave@example.com"
     }
   },
   "background": {
