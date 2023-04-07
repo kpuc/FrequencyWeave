@@ -1,26 +1,28 @@
-# Sort tabs advanced
+# FrequencyWeave
 
-https://addons.mozilla.org/firefox/addon/sort-tabs-advanced/
+https://addons.mozilla.org/en-US/firefox/addon/frequencyweave-tabs/
 
-Web extension for sorting tabs by various criteria:
+Web extension for weaving the order of tabs by frequency of domain.
 
-* url
-* domain
-* title
-* last time of access
+This is forked from monomon's sort-tabs-advanced, which doesn't quite do what we wanted but served as a decent starting point.
 
-I found myself frustrated that it's not possible to sort tabs by domain in Firefox 57.
+If you want to sort your tabs, please consider https://addons.mozilla.org/en-US/firefox/addon/sort-tabs-advanced/ .
 
-Then, I discovered that sorting tabs by access time is kinda useful.
-You can push the tabs you use often to the top, sinking old ones saved for later.
+Problem: our RSS feeds frequently result in many comics from the same domain clumped together.
 
-There are switches in the popup that allow toggling automatic sorting and pinned tab sorting.
+Problem: we add new comics by adding the entire back catalog of episodes as tabs to a browser window.
 
-## Automatic sorting
+Problem: we don't want to read many episodes of the same comic consecutively, and prefer read as a mix of sources.
 
-The last sorting method that you selected gets remembered in settings.
+Solution: manually move tabs around to achieve a more rounded experience...   But this is tedious, and we probably can automate that...
 
-If automatic sorting is enabled, this sorting method will be applied every time you change tabs (create new, change url, etc.).
+This plugin preserves left-to-right order of appearance within a collection of tabs by the same domain (so story arcs are not jumbled), but redistributes these tabs roughly evenly through the windows' set of tabs.
+
+There are two known edge cases, one of which is implemented; we conduct the same process within two specific domains to redistribute artists that share a domain: webcomics.com and gocomics.com.
+
+The as-of-yet un-implemented edge case is domains with a tab count of 1 tending to get "stuck" at the right end of the window, and thus never get consumed by the user.  That will likely land in version 0.3.
+
+Unlike the plugin sort-tabs-advanced this does not have any options to choose from.  Some future version may allow the user to configure additional subweaves.
 
 ## Building the extension
 
