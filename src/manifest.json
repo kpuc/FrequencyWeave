@@ -4,14 +4,14 @@
 	"version" : "0.2",
 	"author" : "kpuc <chris@ciar.org>",
 	"icons" : {
-		"48" : "icons/sortabs-48.png"
+		"48" : "icons/WeaveTabs-48.png"
 	},
 	"description" : "Redistribute tabs by frequency of domain name",
 	"browser_action" : {
 		"default_icon" : {
-			"16" : "icons/sortabs-16.png",
-			"24" : "icons/sortabs-24.png",
-			"48" : "icons/sortabs-48.png"
+			"16" : "icons/WeaveTabs-16.png",
+			"24" : "icons/WeaveTabs-24.png",
+			"48" : "icons/WeaveTabs-48.png"
 		},
 		"default_title" : "FrequencyWeave",
 		"default_popup" : "popup/picker.html",
