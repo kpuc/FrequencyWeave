@@ -138,7 +138,7 @@ function weaveByDomain()
 						if(1 == sblBuckets[sblBuckets.length-1].length)
 						{
 							/*
-							 * Here we take singles on the far right and begin unshifting into the far left.  
+							 * Here we take singles on the far right and begin inserting into the far left, one index deep.  
 							 * We'll keep track of pointers so we don't try to unshift into ourselves.
 							 * This means that if we have more singles buckets than many buckets, we'll be left with a trailing set of singles.  This is fine; 
 							 * over time it'll sort itself out.
@@ -147,10 +147,17 @@ function weaveByDomain()
 							var endIndx = sblBuckets.length-1;
 							while(startIndx < endIndx && 1 == sblBuckets[endIndx].length)
 							{
-								sblBuckets[startIndx].unshift(sblBuckets[endIndx].pop());
+								sblBuckets[startIndx].splice(1,0,sblBuckets[endIndx].pop());
 								startIndx++;
 								endIndx--;
 							}
+							// prune empty elements
+							var tmpbuck = [];
+							for(var i = 0; i < sblBuckets.length; i++)
+								// no clue if .pop() leaves an empty array, so test for everything
+								if(null != sblBuckets[i] && 0 < sblBuckets[i].length && null != sblBuckets[i][0])
+									tmpbuck.push(sblBuckets[i]);
+							sblBuckets[i] = tmpbuck;
 						}
 						
 						// distribute the buckets via slide-insert
