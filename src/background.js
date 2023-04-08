@@ -157,7 +157,7 @@ function weaveByDomain()
 								// no clue if .pop() leaves an empty array, so test for everything
 								if(null != sblBuckets[i] && 0 < sblBuckets[i].length && null != sblBuckets[i][0])
 									tmpbuck.push(sblBuckets[i]);
-							sblBuckets[i] = tmpbuck;
+							sblBuckets = tmpbuck;
 						}
 						
 						// distribute the buckets via slide-insert
@@ -235,7 +235,7 @@ function subweave(sblBuckets,regex,debugging)
 		// result should be like: Array [ "/en/challenge/the-safekeepers/", "the-safekeepers" ]
 		if(debugging)console.log("pattern matching got us:"+JSON.stringify(cmcPath));
 		
-		if(2 > cmcPath.length || '' == cmcPath[1])
+		if(null == cmcPath || 2 > cmcPath.length || '' == cmcPath[1])
 		{
 			if(debugging)console.log("Failed to find a match.");
 			skippedTabs.push(sblBuckets[j]);
