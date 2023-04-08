@@ -18,9 +18,7 @@ Solution: manually move tabs around to achieve a more rounded experience...   Bu
 
 This plugin preserves left-to-right order of appearance within a collection of tabs by the same domain (so story arcs are not jumbled), but redistributes these tabs roughly evenly through the windows' set of tabs.
 
-There are two known edge cases, one of which is implemented; we conduct the same process within two specific domains to redistribute artists that share a domain: webcomics.com and gocomics.com.
-
-The as-of-yet un-implemented edge case is domains with a tab count of 1 tending to get "stuck" at the right end of the window, and thus never get consumed by the user.  That will likely land in version 0.3.
+There are two known edge cases; first, we group all of the tabs with domain frequency of 1 into its own group and migrate to the front of the sorted list (thus unsorting it), so they don't "get stuck" on the far right end of the set of tabs, and second, we conduct the same process that distributes a domains' worth of tabs over the final window tab list within two specific domains to redistribute artists that share a domain: webcomics.com and gocomics.com.
 
 Unlike the plugin sort-tabs-advanced this does not have any options to choose from.  Some future version may allow the user to configure additional subweaves.
 

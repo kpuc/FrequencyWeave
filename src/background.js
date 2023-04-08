@@ -132,38 +132,69 @@ function weaveByDomain()
 						 * Another solution is to take the set of buckets with 1 qty and just push them round-robin onto the buckets with >1 qty.  The first 
 						 * time this process is done we'll be overloaded with rare episodes before we get to very common episodes.. but in a few rounds of 
 						 * reading and closing episodes, the balance will be restored.
+						 * 2023-04-08: these solutions didn't work.  
+						 * A buddy suggested we just make the poly bucket from our singles and migrate it to the front of the sorted list.  
+						 * This is why he gets paid the big bucks, and I do not; that solution is quite like my first above, but 
+						 * does not have the drawback of singles getting stuck on the far left as it shrinks in size.  
 						 */
 						// zzapp -- if we ever decide to invert the order (see sblBuckets.sort() above), this logic won't work!
 						// test if the last bucket is qty 1.  If not, we have nothing to do and skip this logic.
 						if(1 == sblBuckets[sblBuckets.length-1].length)
 						{
+							///*
+							// * Here we take singles on the far right and begin inserting into the far left, one index deep.  
+							// * We'll keep track of pointers so we don't try to unshift into ourselves.
+							// * This means that if we have more singles buckets than many buckets, we'll be left with a trailing set of singles.  This is fine; 
+							// * over time it'll sort itself out.
+							// */
+							//var startIndx = 0;
+							//var endIndx = sblBuckets.length-1;
+							//while(startIndx < endIndx && 1 == sblBuckets[endIndx].length)
+							//{
+							//	sblBuckets[startIndx].splice(1,0,sblBuckets[endIndx].pop());
+							//	startIndx++;
+							//	endIndx--;
+							//}
+							//// prune empty elements
+							//var tmpbuck = [];
+							//for(var i = 0; i < sblBuckets.length; i++)
+							//	// no clue if .pop() leaves an empty array, so test for everything
+							//	if(null != sblBuckets[i] && 0 < sblBuckets[i].length && null != sblBuckets[i][0])
+							//		tmpbuck.push(sblBuckets[i]);
+							//sblBuckets = tmpbuck;
+							
 							/*
-							 * Here we take singles on the far right and begin inserting into the far left, one index deep.  
-							 * We'll keep track of pointers so we don't try to unshift into ourselves.
-							 * This means that if we have more singles buckets than many buckets, we'll be left with a trailing set of singles.  This is fine; 
-							 * over time it'll sort itself out.
+							 * Here we combine the singles (the set of buckets with only a single element) into special bucket that we stick at the start of
+							 * our sorted-by-size list of buckets, without regard to its actual size.  
+							 * This will weave in the singles first in our final array set, and thus they will get read, rather than stay "stuck" at the far
+							 * right end of the final set of tabs.
+							 * This process will flip the order of the singles, and we are doing that deliberately so every time we run it the ends get read 
+							 * early.
 							 */
-							var startIndx = 0;
-							var endIndx = sblBuckets.length-1;
-							while(startIndx < endIndx && 1 == sblBuckets[endIndx].length)
+							var snglIndx = 0;
+							
+							// find the start
+							while(1 < sblBuckets[snglIndx].length)
+								snglIndx++;
+							
+							if(debugging)console.log("Singles start at index "+snglIndx);
+							
+							// create a new start to the buckets, and advance our index by one to compensate
+							sblBuckets.push([]);
+							snglIndx++;
+							
+							// start chooching
+							for(;snglIndx < sblBuckets.length -1; snglIndx++)
 							{
-								sblBuckets[startIndx].splice(1,0,sblBuckets[endIndx].pop());
-								startIndx++;
-								endIndx--;
+								if(debugging)console.log("moving "+sblBuckets[snglIndx][0].url+" to the head of the list");
+								sblBuckets[0].unshift(sblBuckets[snglIndx].pop());
 							}
-							// prune empty elements
-							var tmpbuck = [];
-							for(var i = 0; i < sblBuckets.length; i++)
-								// no clue if .pop() leaves an empty array, so test for everything
-								if(null != sblBuckets[i] && 0 < sblBuckets[i].length && null != sblBuckets[i][0])
-									tmpbuck.push(sblBuckets[i]);
-							sblBuckets = tmpbuck;
 						}
 						
 						// distribute the buckets via slide-insert
 						for(var i = 0; i < sblBuckets.length; i++)
 						{
-							if(0 < sblBuckets[i].length)
+							if( 0 < sblBuckets[i].length && undefined != typeof sblBuckets[i][0] && undefined != sblBuckets[i][0] && null != sblBuckets[i][0])
 							{
 								var hostname = (new URL(sblBuckets[i][0].url)).hostname;
 								if(debugging)console.log("working on bucket '"+hostname+"', with length "+sblBuckets[i].length);
@@ -198,6 +229,10 @@ function weaveByDomain()
 									if(debugging)console.log("recalculated index into tabBuckets2 is " + clcIndx );
 								}
 							}
+							else
+							{
+								console.log("Warning; found a bucket we couldn't process. it looks like:"+JSON.stringify(sblBuckets[i]));
+							}
 						}
 						
 						//if(debugging)console.log("our tabBuckets2 looks like:"+JSON.stringify(tabBuckets2));
@@ -208,7 +243,9 @@ function weaveByDomain()
 							if(null != tabBuckets2[i])
 								newTabList.push(tabBuckets2[i]);
 						
-						if(debugging)console.log("our pruned newTabList looks like:"+JSON.stringify(newTabList));
+						// this message isn't very useful. :P
+						//if(debugging)console.log("our pruned newTabList looks like:"+JSON.stringify(newTabList));
+						if(debugging)console.log("our pruned newTabList looks like:"+JSON.stringify(newTabList.map((tab) => { return tab.url; })));
 						
 						return browser.tabs.move(
 							newTabList.map((tab) => { return tab.id; }),
