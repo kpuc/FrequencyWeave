@@ -141,28 +141,6 @@ function weaveByDomain()
 						// test if the last bucket is qty 1.  If not, we have nothing to do and skip this logic.
 						if(1 == sblBuckets[sblBuckets.length-1].length)
 						{
-							///*
-							// * Here we take singles on the far right and begin inserting into the far left, one index deep.  
-							// * We'll keep track of pointers so we don't try to unshift into ourselves.
-							// * This means that if we have more singles buckets than many buckets, we'll be left with a trailing set of singles.  This is fine; 
-							// * over time it'll sort itself out.
-							// */
-							//var startIndx = 0;
-							//var endIndx = sblBuckets.length-1;
-							//while(startIndx < endIndx && 1 == sblBuckets[endIndx].length)
-							//{
-							//	sblBuckets[startIndx].splice(1,0,sblBuckets[endIndx].pop());
-							//	startIndx++;
-							//	endIndx--;
-							//}
-							//// prune empty elements
-							//var tmpbuck = [];
-							//for(var i = 0; i < sblBuckets.length; i++)
-							//	// no clue if .pop() leaves an empty array, so test for everything
-							//	if(null != sblBuckets[i] && 0 < sblBuckets[i].length && null != sblBuckets[i][0])
-							//		tmpbuck.push(sblBuckets[i]);
-							//sblBuckets = tmpbuck;
-							
 							/*
 							 * Here we combine the singles (the set of buckets with only a single element) into special bucket that we stick at the start of
 							 * our sorted-by-size list of buckets, without regard to its actual size.  
@@ -180,7 +158,7 @@ function weaveByDomain()
 							if(debugging)console.log("Singles start at index "+snglIndx);
 							
 							// create a new start to the buckets, and advance our index by one to compensate
-							sblBuckets.push([]);
+							sblBuckets.unshift([]);
 							snglIndx++;
 							
 							// start chooching
@@ -212,19 +190,41 @@ function weaveByDomain()
 								// we deliberately do *not* truncate or round to int here.  if we did, the frequency would end up bunching.
 								var tbfqncy = normalTabs.length/sblBuckets[i].length;
 								
+								// calculate an offset some value less than the frequency length, based on the bucket number
+								var insrtOffst = i % tbfqncy;
+								
+								// distribute the tabs
 								for(var j = 0; j < sblBuckets[i].length; j++)
 								{
 									if(debugging)console.log("inserting into tabBuckets2 with frequency "+tbfqncy);
 									
-									var clcIndx = (tbfqncy*j);
+									var clcIndx = tbfqncy * j;
 									
 									if(debugging)console.log("calculated index into tabBuckets2 is " + clcIndx );
 									
-									// the "slide" part of this so-called "slide-insert"
-									while(null != tabBuckets2[Math.round(clcIndx)])
-										clcIndx++;
-									
-									tabBuckets2[Math.round(clcIndx)] = sblBuckets[i][j];
+									/*
+									 * Version 0.4:
+									 * In order to attempt to keep small buckets (>1 qty) from getting "stuck" at the far right, we use a different mechanism 
+									 * to distribute all the buckets depending if they are even or odd qty.  
+									 * Odd sized buckets get distributed with the v0.2 method, and even sized buckets now get an offset included to the index, 
+									 * and inserted in place rather than find the next available index.
+									 */
+									if(0 == sblBuckets[i].length % 2)
+									{
+										// insert the tab at the calculated index, and don't slide to find the first available cell
+										if(null != tabBuckets2[Math.round(clcIndx+insrtOffst)])
+											tabBuckets2.splice(Math.round(clcIndx+insrtOffst),0,sblBuckets[i][j]);
+										else
+											tabBuckets2[Math.round(clcIndx+insrtOffst)] = sblBuckets[i][j];
+									}
+									else
+									{
+										// the "slide" part of this so-called "slide-insert"
+										while(null != tabBuckets2[Math.round(clcIndx)])
+											clcIndx++;
+										
+										tabBuckets2[Math.round(clcIndx)] = sblBuckets[i][j];
+									}
 									
 									if(debugging)console.log("recalculated index into tabBuckets2 is " + clcIndx );
 								}
@@ -245,7 +245,7 @@ function weaveByDomain()
 						
 						// this message isn't very useful. :P
 						//if(debugging)console.log("our pruned newTabList looks like:"+JSON.stringify(newTabList));
-						if(debugging)console.log("our pruned newTabList looks like:"+JSON.stringify(newTabList.map((tab) => { return tab.url; })));
+						if(debugging)console.log("our pruned newTabList looks like:"+JSON.stringify(newTabList.map((tab) => { return (null == tab ? "" : tab.url); })));
 						
 						return browser.tabs.move(
 							newTabList.map((tab) => { return tab.id; }),

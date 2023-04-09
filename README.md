@@ -25,3 +25,25 @@ Unlike the plugin sort-tabs-advanced this does not have any options to choose fr
 ## Building the extension
 
 Run `build.sh`, which uses `web-ext`.
+
+## Changes
+
+### v0.4
+
+In order to address the issue with domains with only two tabs available in the window discovered in v0.3, we are changing the process slightly.  Domains with an even number count of tabs will will have an offset calculated in addition to the frequency, and be inserted into the index calculated rather than find the first available cell after the index calculated.  To reduce the "bunching" found in v0.1, we keep the process for odd number count of tabs the same.  
+This still results in bunching, but the frequency we read very common items in the left 10% or so of the tab set isn't very different from v0.2, and slightly favors both very common and very uncommon domains over the mid-range.  Over time this may balance out to a frequency weave of very common items and mid-range items both being roughly even in frequency.  
+
+### v0.3
+
+This version groups the collection of "buckets" with a quantity of 1 into its own bucket and distributes that into the final array first, which nicely resovles the issue discovered in v0.2.  However, now it seems buckets with qty 2 are all "stuck" on the far left and bunched immediately adjacent.  This isn't a great version, so we haven't uploaded it to mozilla, and you'll have to build your own.
+
+### v0.2
+
+First working version uploaded to mozilla.  
+Added the subweave call to webtoons and gocomics.
+Switched the method of insert from finding the indext and adding if the cell is empty or splicing it into the array if it wasn't to finding the first empty cell on or after the calculated index.  This generally preserves a good frequency, but it tends to keep "buckets" with a frequency of 1 "stuck" on the far right.
+
+### v0.1
+
+First version uploaded to mozilla.  Was untested after last minute changes, and didn't work.
+Collects tabs into "buckets" by domain name, calculates how frequent to spread the contents of each bucket, and attempts to do so.  This method has a tendency to overload the far left with contents of small "buckets", and ends up with a lot of "bunching" in the middle towards far right.
