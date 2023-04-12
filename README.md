@@ -34,7 +34,7 @@ This version pulls off the set of tabs with frequency 1 into their own list.
 Then we inverted our process from weaving largest-to-smallest to smallest-to-largest.
 Finally we weave in the "singles" by inserting them in every second tab.
 
-This results in what appears to be a pretty homegeneous weave, with the slight deviation on the far left where the singles are included.  This prevents the singles from getting "stuck" on the far right and never read, and doesn't over-saturate the reading experience with clumbs of very common domains.
+This results in what appears to be a pretty homegeneous weave, with the slight deviation on the far left where the singles are included.  This prevents the singles from getting "stuck" on the far right and never read, and doesn't over-saturate the reading experience with clumps of very common domains.
 
 This is as close to ideal as we think it is going to be.  Future development may focus on making the subweaves configurable, or making the UI more pleasant, or speeding up the process.  Anyone have suggestions on how to do any of that?
 
