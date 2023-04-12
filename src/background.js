@@ -185,10 +185,10 @@ function weaveByDomain()
 								if(hostname in hardcodedSubWeaves)
 									sblBuckets[i] = subweave(sblBuckets[i],hardcodedSubWeaves[hostname],debugging);
 								
-								if(debugging)console.log("Calculating tab frequency by taking the total number of tabs '"+normalTabs.length+"' and dividing by the size of our bucket '"+sblBuckets[i].length+"'");
+								if(debugging)console.log("Calculating tab frequency by taking the total number of tabs '"+tabBuckets2.length+"' and dividing by the size of our bucket '"+sblBuckets[i].length+"'");
 								
 								// we deliberately do *not* truncate or round to int here.  if we did, the frequency would end up bunching.
-								var tbfqncy = normalTabs.length/sblBuckets[i].length;
+								var tbfqncy = tabBuckets2.length/sblBuckets[i].length;
 								
 								// calculate an offset some value less than the frequency length, based on the bucket number
 								var insrtOffst = i % tbfqncy;
@@ -208,8 +208,10 @@ function weaveByDomain()
 									 * to distribute all the buckets depending if they are even or odd qty.  
 									 * Odd sized buckets get distributed with the v0.2 method, and even sized buckets now get an offset included to the index, 
 									 * and inserted in place rather than find the next available index.
+									 * Update: this pushes too many items towards the left by virtue of leaving many holes on the right.  Mitigate by only 
+									 * considering the latter half of the buckets (which will be considerably smaller than half of the set of tabs)
 									 */
-									if(0 == sblBuckets[i].length % 2)
+									if(i > (sblBuckets.length/2) && 0 == sblBuckets[i].length % 2)
 									{
 										// insert the tab at the calculated index, and don't slide to find the first available cell
 										if(null != tabBuckets2[Math.round(clcIndx+insrtOffst)])
