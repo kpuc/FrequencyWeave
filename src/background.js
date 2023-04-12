@@ -322,6 +322,20 @@ function weaveByDomain()
 						//sblBuckets.sort(compareByArrLenDesc);
 						sblBuckets.sort(compareByArrLenAsc);
 						
+						// collect the "singles" into it's own bucket
+						var singles = [];
+						for(var i = 0; i < sblBuckets.length; i++)
+							if(1 == sblBuckets[i].length)
+								singles.unshift(sblBuckets[i].shift());
+							else
+								break;
+						// clean the buckets
+						var buckBuf = [];
+						for(var i = 0; i < sblBuckets.length; i++)
+							if(0 < sblBuckets[i].length)
+								buckBuf.push(sblBuckets[i]);
+						sblBuckets = buckBuf;
+						
 						/*
 						 * Now we distribute the buckets.
 						 * Our new algo takes the smallest bucket and weaves the next largest into it, then the next largest into it, etc., etc., until all the
@@ -364,7 +378,7 @@ function weaveByDomain()
 									var tmpBuck = [];
 									while(0 < tabBuckets2.length && 0 < sblBuckets[i].length)
 									{
-										// take a tab from the larger (or later, when equal in size) bucket first
+										// take a tab from the larger (or equal in size) bucket first
 										if(0 < sblBuckets[i].length)
 											tmpBuck.push(sblBuckets[i].shift());
 										
@@ -376,8 +390,10 @@ function weaveByDomain()
 									continue;
 								}
 								
-								// calculate an offset some value less than the frequency length, based on the bucket number
-								var insrtOffst = i % tbfqncy;
+								// calculate an offset some value less than the frequency length.  We'll only apply it for buckets even in length
+								var insrtOffst = 0;
+								if(0 == sblBuckets[i].length % 2)
+									insrtOffst = i % tbfqncy;
 								
 								// distribute the tabs
 								for(var j = 0; j < sblBuckets[i].length; j++)
@@ -385,6 +401,9 @@ function weaveByDomain()
 									if(debugging)console.log("inserting into tabBuckets2 with frequency "+tbfqncy);
 									
 									var clcIndx = (tbfqncy * j)+j; // note that we add j; this accounts for the array growing in size as we insert items
+									
+									// for even-lengthed items, we begin our inserts at an offset within its frequency
+									clcIndx += insrtOffst;
 									
 									if(debugging)console.log("calculated index into tabBuckets2 is " + clcIndx );
 									
@@ -400,6 +419,27 @@ function weaveByDomain()
 							{
 								console.log("Warning; found a bucket we couldn't process. it looks like:"+JSON.stringify(sblBuckets[i]));
 							}
+						}
+						// now do a simple weave the singles back in
+						//for(var i = 1; i < tabBuckets2.length; i+=2)
+						//	if(0 == singles.length)
+						//		break;
+						//	else if(i+2 < tabBuckets2.length)
+						//		tabBuckets2.splice(i,0,singles.shift());
+						//	else
+						//		while(0 < singles.length)
+						//			tabBuckets2.push(singles.shift())
+						//for (var i = 0; i < (singles.length * 2); i+=2)
+						//	if(i < tabBuckets2.length)
+						//		tabBuckets2.splice(i,0,singles.shift());
+						var sindx = 1;
+						while(singles.length)
+						{
+							if(sindx < tabBuckets2.length)
+								tabBuckets2.splice(sindx,0,singles.shift());
+							else
+								tabBuckets2.push(singles.shift());
+							sindx+=2;
 						}
 						
 						//if(debugging)console.log("our tabBuckets2 looks like:"+JSON.stringify(tabBuckets2));
