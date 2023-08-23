@@ -5,14 +5,43 @@
 /**
  * menu definitions
  */
-let menuDefs = [{
-	id : "FrequencyWeave-by-domain",
-	title : "FrequencyWeave non-pinned tabs by domain for this window",
-	contexts : ["tools_menu", "browser_action"],
-	icons : {
-		16 : "icons/WeaveTabs-16.png"
+let menuDefs = [
+	{
+		id : "FrequencyWeave-by-domain",
+		title : "FrequencyWeave non-pinned tabs by domain for this window",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
 	}
-}];
+	,
+	{
+		id : "FrequencyWeave-by-domain-v1-LeftTenPercent",
+		title : "FrequencyWeave non-pinned leftmost 10% tabs by domain for this window, version 1",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	//,
+	//{
+	//	id : "FrequencyWeave-by-domain-v2",
+	//	title : "FrequencyWeave non-pinned tabs by domain for this window, version 2",
+	//	contexts : ["tools_menu", "browser_action"],
+	//	icons : {
+	//		16 : "icons/WeaveTabs-16.png"
+	//	}
+	//}
+	//,
+	//{
+	//	id : "FrequencyWeave-by-domain-v2-LeftTenPercent",
+	//	title : "FrequencyWeave non-pinned leftmost 10% tabs by domain for this window, version 2",
+	//	contexts : ["tools_menu", "browser_action"],
+	//	icons : {
+	//		16 : "icons/WeaveTabs-16.png"
+	//	}
+	//}
+];
 
 
 
@@ -22,6 +51,7 @@ function onError(error) {
 
 function clickHandler(evt) 
 {
+	console.log("Target ID: '" + evt.target.id + "'" );
 	let backgroundWindow = browser.runtime.getBackgroundPage();
 	backgroundWindow.then( (w) => w.sortTabsComparatorName(evt.target.id))
 		.then(
