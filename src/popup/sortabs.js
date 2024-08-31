@@ -17,30 +17,67 @@ let menuDefs = [
 	,
 	{
 		id : "FrequencyWeave-by-domain-v1-LeftTenPercent",
-		title : "FrequencyWeave non-pinned leftmost 10% tabs by domain for this window, version 1",
+		title : "FrequencyWeave non-pinned leftmost ~10% tabs v1",
 		contexts : ["tools_menu", "browser_action"],
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
 	}
-	//,
-	//{
-	//	id : "FrequencyWeave-by-domain-v2",
-	//	title : "FrequencyWeave non-pinned tabs by domain for this window, version 2",
-	//	contexts : ["tools_menu", "browser_action"],
-	//	icons : {
-	//		16 : "icons/WeaveTabs-16.png"
-	//	}
-	//}
-	//,
-	//{
-	//	id : "FrequencyWeave-by-domain-v2-LeftTenPercent",
-	//	title : "FrequencyWeave non-pinned leftmost 10% tabs by domain for this window, version 2",
-	//	contexts : ["tools_menu", "browser_action"],
-	//	icons : {
-	//		16 : "icons/WeaveTabs-16.png"
-	//	}
-	//}
+	,
+	{
+		id : "FrequencyWeave-by-domain-v2",
+		title : "FrequencyWeave v2",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-v2-LeftTenPercent",
+		title : "FrequencyWeave ~10% v2",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	
+	,
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-ltr",
+		title : "FrequencyWeave RoundRobin Left to Right",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-ltr-LeftTenPercent",
+		title : "FrequencyWeave ~10% RoundRobin Left to Right",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-rtl",
+		title : "FrequencyWeave RoundRobin Right to Left",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-rtl-LeftTenPercent",
+		title : "FrequencyWeave ~10% RoundRobin Right to Left",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
 ];
 
 
