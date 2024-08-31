@@ -40,7 +40,24 @@ let menuDefs = [
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
+	}/*,
+	{
+		id : "FrequencyWeave-by-domain-v3",
+		title : "FrequencyWeave v3",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
 	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-v3-LeftTenPercent",
+		title : "FrequencyWeave ~10% v3",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}*/
 	
 	,
 	{

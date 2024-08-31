@@ -50,21 +50,30 @@ function sortTabsComparatorName(compName)
 		return weaveByDomain("basic");
 	else if ("FrequencyWeave-by-domain-v1-LeftTenPercent" == compName)
 		return weaveByDomain("basic_left10");
+	
 	else if ("FrequencyWeave-by-domain-v2" == compName)
 		//return weaveByDomain_v2();
 		return weaveByDomain("basic_v2");
 	else if ("FrequencyWeave-by-domain-v2-LeftTenPercent" == compName)
 		//return weaveByDomain_v2_leftTenPercent();
 		return weaveByDomain("basic_v2_Left10");
-	// now some round-robin goodness
+		
+	else if ("FrequencyWeave-by-domain-v3" == compName)
+		return weaveByDomain("basic_v3");
+	else if ("FrequencyWeave-by-domain-v3-LeftTenPercent" == compName)
+		return weaveByDomain("basic_v3_Left10");
+		
+	// now some round-robin goodness, left to right
 	else if ("FrequencyWeave-by-domain-RoundRobin-ltr" == compName)
 		return weaveByDomain("roundRobin");
 	else if ("FrequencyWeave-by-domain-RoundRobin-ltr-LeftTenPercent" == compName)
 		return weaveByDomain("roundRobin_left10");
+	// right to left
 	else if ("FrequencyWeave-by-domain-RoundRobin-rtl" == compName)
 		return weaveByDomain("roundRobin_rtl");
 	else if ("FrequencyWeave-by-domain-RoundRobin-rtl-LeftTenPercent" == compName)
 		return weaveByDomain("roundRobin_rtl_left10");
+	
 	return weaveByDomain();
 }
 
@@ -74,7 +83,7 @@ function weaveByDomain(weaveMethod)
 	let num_pinned = 0;
 	
 	let debugging = [];
-	//let debugging = null; // uncomment to switch off debugging
+	debugging = null; // uncomment to switch off debugging, comment to switch on
 	
 	return browser.tabs.query(
 		{
@@ -129,6 +138,16 @@ function weaveByDomain(weaveMethod)
 						{
 							tabCnt = Math.ceil(0.1 * normalTabs.length + Math.sqrt(normalTabs.length));
 							newTabList = weaveByDomain_v2(normalTabs,tabCnt,debugging);
+						}
+						else if ("basic_v3" == weaveMethod)
+						{
+							tabCnt = normalTabs.length;
+							newTabList = weaveByDomain_v3(normalTabs,tabCnt,mergeArrays_depositPerBucketNeed_v3,mergeArrays_RoundRobin_rtl,debugging);
+						}
+						else if ("basic_v3_Left10" == weaveMethod)
+						{
+							tabCnt = Math.ceil(0.1 * normalTabs.length + Math.sqrt(normalTabs.length));
+							newTabList = weaveByDomain_v3(normalTabs,tabCnt,mergeArrays_depositPerBucketNeed_v3,mergeArrays_RoundRobin_rtl,debugging);
 						}
 						else if ("roundRobin" == weaveMethod)
 						{
@@ -418,15 +437,17 @@ function weaveByDomain_v2(normalTabs,tabCnt,debugging)
 	//sblBuckets.sort(compareByArrLenDesc);
 	//sblBuckets.sort(compareByArrLenAsc);
 	
-	// collect the "singles" into its own bucket
+	// collect the "singles" into its own bucket.  Detect and process any bucket that is to be sub-weaved (like webtoons or gocomics)
 	var singles = [];
 	for(var i = 0; i < sblBuckets.length; i++)
 	{
 		if(debugging)debugging.push("weaveByDomain_v2(): testing bucket '"+sblBuckets[i].hostname+"' has length "+sblBuckets[i].tabs.length);
+		// collect the "singles" into its own bucket
 		if(1 == sblBuckets[i].tabs.length)
 			singles.unshift(sblBuckets[i].tabs.shift()); // singles have no order.  with .unshift(), subsequent runs will reverse their order, ensuring balance to the force
 		else
 		{
+			// 'hostname' is the same as the domain name.  By using this as the key, we sift our tabs into buckets by domain.
 			var hostname = (new URL(sblBuckets[i].tabs[0].url)).hostname;
 			if(debugging)debugging.push("weaveByDomain_v2(): working on bucket '"+hostname+"', with length "+sblBuckets[i].tabs.length);
 			if('' == hostname)
@@ -1352,6 +1373,7 @@ function mergeArrays_depositPerBucketNeed_v2(processingTabs,tabCnt,_debugging)
 			
 			/*
 			 * Calculate everything, generate a log report, then perform logic.
+			 * WARNING: we are performing logic with our report object!  This is a bad idea, but we are doing it anyway, apparently.
 			 */
 			var report = {};
 			report.CurrentBucket = processingTabs[i].hostname;
@@ -1499,6 +1521,217 @@ function mergeArrays_depositPerBucketNeed_v2(processingTabs,tabCnt,_debugging)
 		{
 			// Now what?  we shouldn't have ever selected an emtpy bucket, but it appears we have.  How would we recover from this?  (How would this case even arise?)
 			console.log("you should never see this message")
+		}
+		
+	}
+	
+	// we should be done
+	return newTabs;
+}
+
+
+/*
+ * This version slightly biases larger buckets leftwards, and smaller buckets rightwards, causing
+ * the user to read more common items at a slightly elevated rate.  This should, gradually, trend 
+ * towards a more even distribution of the tabs.
+ */
+function mergeArrays_depositPerBucketNeed_v3(_processingTabs,tabCnt,_debugging)
+{
+	var debugging = null;
+	if(undefined != _debugging)
+		debugging = _debugging;
+	
+	// clone the object we received, so we can manipulate it without fear of effecting the original
+	var processingTabs = JSON.parse(JSON.stringify(_processingTabs));
+	
+	/*
+	 * This merge Arrays version works by keeping track of how much a bucket 'needs' to have its
+	 * first element shifted off and into the final array, based on the current index and the frequency.
+	 *
+	 * We are trying something new; we are recalculating the frequency after each insert, and we are basing 
+	 * the frequency not by the ratio of the size of this bucket vs the size of all the remaining tabs  to
+	 * assign, but instead the size of this bucket vs the size of all the remaining tabs to assign minus 
+	 * the size of this bucket.  By recalculating that buckets' frequency in this way after each insert 
+	 * from that bucket, the frequency of appearance from large buckets should be higher on the left and 
+	 * graudally become less frequent towards the right.  Small buckets will be similarly weighted, but 
+	 * their repeat apperance will much more quickly become less frequent.
+	 */
+	
+	if(debugging)
+	{
+		debugging.push("mergeArrays_depositPerBucketNeed_v3(): Buckets overview:");
+		for(var i = 0; i < processingTabs.length; i++)
+			//debugging.push("Bucket '"+processingTabs[i].hostname+"' has "+processingTabs[i].tabs.length+" tabs, and a frequency of "+processingTabs[i].frequency);
+		{
+			// clone our bucket so we can manipulate it without corrupting the original
+			//var bkttmp = JSON.parse(JSON.stringify(processingTabs[i]));
+			// clear the set of thabs by replacing it with the count
+			//bkttmp.tabs = bkttmp.tabs.length;
+			//debugging.push( "Bucket '" + processingTabs[i].hostname + "': \r\n" + JSON.stringify( bkttmp ) );
+			debugging.push( "Bucket '"         + processingTabs[i].hostname    + "': {");
+			debugging.push("     tabs: "       + processingTabs[i].tabs.length + ",");
+			debugging.push("     frequency: "  + processingTabs[i].frequency   + ",");
+			debugging.push("     lastInsert: " + processingTabs[i].lstInsrt    + "");
+			debugging.push("}" );
+		}
+	}
+	
+	/*
+	 * We are going to try a simple algo:
+	 * Evaluate each element in processingTabs.
+	 * Pick the bucket that needs an insert the most, 
+	 * as determined by the ratio of the difference between the current index and the last insert, vs the frequency.
+	 */
+	var newTabs = [];
+	var lastHostUsed = '';
+	for(var insrtIndx = 0; insrtIndx < tabCnt; insrtIndx++)
+	{
+		var bestBucketIdx = 0;
+		var bestBucketR = 0;
+		var foundBucket = false;
+		for(var i = 0; i < processingTabs.length; i++)
+		//for(var foo in processingTabs)
+		{
+			// if we have emptied this bucket, skip it
+			if(0 == processingTabs[i].tabs.length)
+				continue;
+			
+			/*
+			 * Calculate everything, generate a log report, then perform logic.
+			 * WARNING: we are performing logic with our report object!  This is a bad idea, but we are doing it anyway, apparently.
+			 */
+			var report = {};
+			report.CurrentBucket = processingTabs[i].hostname;
+			report.LastBucket = lastHostUsed;
+			report.minimumInsertIndex = processingTabs[i].lstInsrt + (processingTabs[i].frequency/2);
+			report.currentR = (insrtIndx - processingTabs[i].lstInsrt) / processingTabs[i].frequency;
+			
+			if(debugging)debugging.push("mergeArrays_depositPerBucketNeed_v3(): Evaluating bucket '"+processingTabs[i].hostname+"'");
+			if(debugging)debugging.push(JSON.stringify(report));
+			
+			// If we used this bucket on the last insert, skip it
+			if(lastHostUsed == processingTabs[i].hostname)
+			{
+				if(debugging)debugging.push("Skipping bucket '"+lastHostUsed+"' because we used it last time")
+				continue;
+			}
+			
+			/*
+			 * Trying something new:  If we inserted this bucket less than half its frequency ago, skip it.
+			 */
+			if(report.minimumInsertIndex > insrtIndx)
+			{
+				if(debugging)debugging.push( "Skipping bucket '" + processingTabs[i].hostname + 
+					"'; current indx: "+insrtIndx+" minimum next insert: " + report.minimumInsertIndex );
+				continue;
+			}
+			
+			
+			if(debugging)debugging.push("Current need:"+report.currentR+", best need:"+bestBucketR);
+			
+			// If we haven't found a bucket yet, we use this bucket implicitly.
+			// If the current bucket needs an insert more than the last most-needful found bucket, update the pointer and needful value
+			if(!foundBucket || report.currentR >= bestBucketR)
+			{
+				bestBucketR = report.currentR;
+				bestBucketIdx = i;
+				foundBucket = true;
+			}
+			//if(debugging)debugging.push("mergeArrays_depositPerBucketNeed_v3(): for index "+insrtIndx+" the current winner is '"+
+			//	processingTabs[bestBucketIdx].hostname+"', with 'need': '"+bestBucketR+"'");
+			//if(debugging&&foundBucket)debugging.push("mergeArrays_depositPerBucketNeed_v3():\r\nfor index " + 
+			//	insrtIndx+" the current winner is '"+processingTabs[bestBucketIdx].hostname+"'");
+		}
+		
+		// if we didn't find a bucket, pick the next valid bucket
+		if(!foundBucket)
+		{
+			if(debugging)debugging.push("didn't find a bucket, so we are picking one");
+			
+			var oldestInsrt = insrtIndx;
+			for(var i = 0 ; i < processingTabs.length; i++)
+			{
+				// skip buckets that are empty
+				if(0 == processingTabs[i].tabs.length)
+					continue;
+				
+				// skip bucket if we used it last time
+				if(lastHostUsed == processingTabs[i].hostname)
+					continue;
+				
+				// pick the oldest bucket
+				if(oldestInsrt >= processingTabs[i].lstInsrt)
+				{
+					bestBucketIdx = i;
+					oldestInsrt = processingTabs[i].lstInsrt;
+					foundBucket = true;
+				}
+			}
+			// sweep again without the last domain restriction, if we need to
+			if(!foundBucket)
+			{
+				for(var i = 0 ; i < processingTabs.length; i++)
+				{
+					// skip buckets that are empty
+					if(0 == processingTabs[i].tabs.length)
+						continue;
+					
+					// pick the oldest bucket
+					if(oldestInsrt >= processingTabs[i].lstInsrt)
+					{
+						bestBucketIdx = i;
+						oldestInsrt = processingTabs[i].lstInsrt;
+						foundBucket = true;
+					}
+				}
+			}
+		}
+		
+		if(debugging)debugging.push( "mergeArrays_depositPerBucketNeed_v3(): selected bucket '"
+			+ processingTabs[bestBucketIdx].hostname + "', url '" + processingTabs[bestBucketIdx].tabs[0].url + "'" );
+		
+		// this shouldn't be possible, but just in case, test if there is anything in this bucket to contribute
+		if(0 == processingTabs[bestBucketIdx].tabs.length)
+		{
+			// Now what?  we shouldn't have ever selected an emtpy bucket, but it appears we have.  How would we recover from this?  (How would this case even arise?)
+			console.log("you should never see this message");
+			continue;
+		}
+		// update the last used bucket
+		lastHostUsed = processingTabs[bestBucketIdx].hostname;
+		
+		// now assign from our most needed bucket.
+		newTabs.push(processingTabs[bestBucketIdx].tabs.shift());
+		
+		// recalculate frequency
+		// The frequency was originally set with:
+		// frequency : (tabsArray.length / tabBuckets[foo].length) 
+		// we are doing to do something similar.
+		if(0 < processingTabs[bestBucketIdx].tabs.length)
+		{
+			// update the last inserted index.  This is deliberately a lie; we prevent drift by claiming our last insert was our frequency ago.
+			processingTabs[bestBucketIdx].lstInsrt += processingTabs[bestBucketIdx].frequency;
+			
+			if(debugging)debugging.push("mergeArrays_depositPerBucketNeed_v3(): Actual insert index: '"+insrtIndx+"', .lstInsrt: '"+processingTabs[bestBucketIdx].lstInsrt+"'");
+		
+			if(debugging)debugging.push("mergeArrays_depositPerBucketNeed_v3(): Frequency before recalc: '"+processingTabs[bestBucketIdx].frequency+"'");
+		
+			//processingTabs[bestBucketIdx].frequency = ((1 + tabCnt) - processingTabs[bestBucketIdx].tabs.length ) / processingTabs[bestBucketIdx].tabs.length;
+			processingTabs[bestBucketIdx].frequency = ( tabCnt - Math.sqrt(processingTabs[bestBucketIdx].tabs.length) ) / processingTabs[bestBucketIdx].tabs.length;
+			
+			if(debugging)debugging.push("mergeArrays_depositPerBucketNeed_v3(): Frequency after recalc: '"+processingTabs[bestBucketIdx].frequency
+				+ "'. tabs:'" + tabCnt + "' bucket:'" + processingTabs[bestBucketIdx].tabs.length + "'" );
+		}
+		// else, remove the empty bucket
+		else
+		{
+			var tmpBuf = [];
+			for(var j = 0; j < processingTabs.length; j++)
+			{
+				if(0 < processingTabs[j].tabs.length)
+					tmpBuf.push(processingTabs[j]);
+			}
+			processingTabs = tmpBuf;
 		}
 		
 	}

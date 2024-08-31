@@ -2,6 +2,8 @@
 
 https://addons.mozilla.org/en-US/firefox/addon/frequencyweave-tabs/
 
+https://github.com/kpuc/FrequencyWeave
+
 Web extension for weaving the order of tabs by frequency of domain.
 
 This is forked from monomon's sort-tabs-advanced, which doesn't quite do what we wanted but served as a decent starting point.
@@ -27,6 +29,15 @@ Unlike the plugin sort-tabs-advanced this does not have any options to choose fr
 Run `build.sh`, which uses `web-ext`.
 
 ## Changes
+
+### v0.10
+
+Disabled version 3 of the homogonized method; it was supposed to slightly bias the frequency of larger buckets to the left, but it doesn't work well.
+This may be the first version with the round-robin code to land on Mozilla's plugin server.  No more re-weaving my tabs in a beta browser (should mozilla accept this version)!
+
+### v0.6 - v0.9
+
+Various attempts to better homogonize, and slightly bias.  Added some round-robin methods, for when you want to insert tabs by looping through the set of domains.  
 
 ### v0.5
 
