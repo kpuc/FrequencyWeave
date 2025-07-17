@@ -32,12 +32,12 @@ Run `build.sh`, which uses `web-ext`.
 
 ### v0.10
 
-Disabled version 3 of the homogonized method; it was supposed to slightly bias the frequency of larger buckets to the left, but it doesn't work well.
+Disabled version 3 of the homogenized method; it was supposed to slightly bias the frequency of larger buckets to the left, but it doesn't work well.
 This may be the first version with the round-robin code to land on Mozilla's plugin server.  No more re-weaving my tabs in a beta browser (should mozilla accept this version)!
 
 ### v0.6 - v0.9
 
-Various attempts to better homogonize, and slightly bias.  Added some round-robin methods, for when you want to insert tabs by looping through the set of domains.  
+Various attempts to better homogenize, and slightly bias.  Added some round-robin methods, for when you want to insert tabs by looping through the set of domains.  
 
 ### v0.5
 
