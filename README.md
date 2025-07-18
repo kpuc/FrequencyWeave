@@ -30,6 +30,11 @@ Run `build.sh`, which uses `web-ext`.
 
 ## Changes
 
+### v0.11
+
+Added two new weaves.  We generate the basic weave and one of the round-robin weaves, and round-robin distinct tabs from both those results.
+This allows us to satisfy our desire to read early the low frequency domains intermingled with the homogenious frequency, or read early the high frequency domains without so much monotony.
+
 ### v0.10
 
 Disabled version 3 of the homogenized method; it was supposed to slightly bias the frequency of larger buckets to the left, but it doesn't work well.
