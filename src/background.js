@@ -46,34 +46,61 @@ let hardcodedSubWeaves = {
 // this guy appears to be called from sortabs.js
 function sortTabsComparatorName(compName) 
 {
-	if("FrequencyWeave-by-domain" == compName)
-		return weaveByDomain("basic");
-	else if ("FrequencyWeave-by-domain-v1-LeftTenPercent" == compName)
-		return weaveByDomain("basic_left10");
-	
-	else if ("FrequencyWeave-by-domain-v2" == compName)
-		//return weaveByDomain_v2();
-		return weaveByDomain("basic_v2");
-	else if ("FrequencyWeave-by-domain-v2-LeftTenPercent" == compName)
-		//return weaveByDomain_v2_leftTenPercent();
-		return weaveByDomain("basic_v2_Left10");
+	switch (compName) 
+	{
+		// we personally never use v1, so we may remove it in the future.
+		// We think v2 and v3 are essentially the same, but use two processes to generate similar results.
 		
-	else if ("FrequencyWeave-by-domain-v3" == compName)
-		return weaveByDomain("basic_v3");
-	else if ("FrequencyWeave-by-domain-v3-LeftTenPercent" == compName)
-		return weaveByDomain("basic_v3_Left10");
+		case "FrequencyWeave-by-domain":
+			return weaveByDomain("basic");
+		case "FrequencyWeave-by-domain-v1-LeftTenPercent":
+			return weaveByDomain("basic_left10");
+		case "FrequencyWeave-by-domain-v2":
+			return weaveByDomain("basic_v2");
+		case "FrequencyWeave-by-domain-v2-LeftTenPercent":
+			return weaveByDomain("basic_v2_Left10");
+			
+		// We have disabled v3 via not including it in the menuDefs above.  it should be producing similar, if not identical, results to v2, which we know works pretty well.
+		// The basic round-robin methods are using the v3 code, with directives that cause it to round-robin instead of frequency weave.
 		
-	// now some round-robin goodness, left to right
-	else if ("FrequencyWeave-by-domain-RoundRobin-ltr" == compName)
-		return weaveByDomain("roundRobin");
-	else if ("FrequencyWeave-by-domain-RoundRobin-ltr-LeftTenPercent" == compName)
-		return weaveByDomain("roundRobin_left10");
-	// right to left
-	else if ("FrequencyWeave-by-domain-RoundRobin-rtl" == compName)
-		return weaveByDomain("roundRobin_rtl");
-	else if ("FrequencyWeave-by-domain-RoundRobin-rtl-LeftTenPercent" == compName)
-		return weaveByDomain("roundRobin_rtl_left10");
+		// weave all the tabs in the window using version 3
+		case "FrequencyWeave-by-domain-v3":
+			return weaveByDomain("basic_v3");
+			
+		// weave the leftmost 10%+sqrt(tabCount) of tabs in the window using version 3
+		case "FrequencyWeave-by-domain-v3-LeftTenPercent":
+			return weaveByDomain("basic_v3_Left10");
+			
+		// round robin left to right
+		case "FrequencyWeave-by-domain-RoundRobin-ltr":
+			return weaveByDomain("roundRobin");
+		case "FrequencyWeave-by-domain-RoundRobin-ltr-LeftTenPercent":
+			return weaveByDomain("roundRobin_left10");
+			
+		// round robin right to left
+		case "FrequencyWeave-by-domain-RoundRobin-rtl":
+			return weaveByDomain("roundRobin_rtl");
+		case "FrequencyWeave-by-domain-RoundRobin-rtl-LeftTenPercent":
+			return weaveByDomain("roundRobin_rtl_left10");
+			
+		// round robin the results of version 3 and round-robin left to right
+		case "FrequencyWeave-by-domain-RoundRobin-basic-v3":
+			return weaveByDomain("roundRobin_basic_v3");
+		case "FrequencyWeave-by-domain-RoundRobin-basic-v3-LeftTenPercent":
+			return weaveByDomain("roundRobin_basic_v3_left10");
+			
+		// round robin the results of version 3 and round-robin right to left
+		case "FrequencyWeave-by-domain-RoundRobin-rtl-basic-v3":
+			return weaveByDomain("roundRobin_rtl_basic_v3");
+		case "FrequencyWeave-by-domain-RoundRobin-rtl-basic-v3-LeftTenPercent":
+			return weaveByDomain("roundRobin_rtl_basic_v3_left10");
+		
+		// default, if we don't recognize the name
+		default:
+			break;
+	}
 	
+	// if we don't recognize the name, we return the default weaveByDomain method
 	return weaveByDomain();
 }
 
@@ -176,6 +203,47 @@ function weaveByDomain(weaveMethod)
 							tabCnt = Math.ceil(0.1 * normalTabs.length + Math.sqrt(normalTabs.length));
 							newTabList = weaveByDomain_v3(normalTabs,tabCnt,mergeBuckets_RoundRobin_rtl,mergeArrays_RoundRobin_rtl,debugging);
 						}
+						/*
+						 * New v0.11 methods:
+						 * We are adding two new methods that round-robin the results of two methods above: right-to-left with v3 and left-to-right with v3.
+						 * This gives the user the choice to balance the desire to consume tabs in the homogeneous sorting with the desire to consume tabs
+						 * either over-represented or under-represented in the weave.
+						 * 
+						 * This version will take the simple process of producing both weaves and selecting tabs from each, rather than the more complicated
+						 * process of doing that in one pass.
+						 * We think this is a decent compromise, as on this developers machine, the profile looks like our code runs a few dozen times faster 
+						 * than mozilla's API browsers.tabs.move() does.  The cost will mostly be memory, which we haven't profiled.
+						 */
+						else if ("roundRobin_basic_v3" == weaveMethod)
+						{
+							tabCnt = normalTabs.length;
+							// collect both lists
+							var newTabListA = weaveByDomain_v3(normalTabs,tabCnt,mergeBuckets_RoundRobin_ltr,mergeArrays_RoundRobin_rtl,debugging);
+							var newTabListB = weaveByDomain_v3(normalTabs,tabCnt,mergeArrays_depositPerBucketNeed_v3,mergeArrays_RoundRobin_rtl,debugging);
+							// merge the two lists.
+							newTabList = roundRobinTwoWovenLists(newTabListA,newTabListB,debugging);
+						}
+						else if ("roundRobin_basic_v3_left10" == weaveMethod)
+						{
+							tabCnt = Math.ceil(0.1 * normalTabs.length + Math.sqrt(normalTabs.length));
+							var newTabListA = weaveByDomain_v3(normalTabs,tabCnt,mergeBuckets_RoundRobin_ltr,mergeArrays_RoundRobin_rtl,debugging);
+							var newTabListB = weaveByDomain_v3(normalTabs,tabCnt,mergeArrays_depositPerBucketNeed_v3,mergeArrays_RoundRobin_rtl,debugging);
+							newTabList = roundRobinTwoWovenLists(newTabListA,newTabListB,debugging);
+						}
+						else if ("roundRobin_rtl_basic_v3" == weaveMethod)
+						{
+							tabCnt = normalTabs.length;
+							var newTabListA = weaveByDomain_v3(normalTabs,tabCnt,mergeBuckets_RoundRobin_rtl,mergeArrays_RoundRobin_rtl,debugging);
+							var newTabListB = weaveByDomain_v3(normalTabs,tabCnt,mergeArrays_depositPerBucketNeed_v3,mergeArrays_RoundRobin_rtl,debugging);
+							newTabList = roundRobinTwoWovenLists(newTabListA,newTabListB,debugging);
+						}
+						else if ("roundRobin_rtl_basic_v3_left10" == weaveMethod)
+						{
+							tabCnt = Math.ceil(0.1 * normalTabs.length + Math.sqrt(normalTabs.length));
+							var newTabListA = weaveByDomain_v3(normalTabs,tabCnt,mergeBuckets_RoundRobin_rtl,mergeArrays_RoundRobin_rtl,debugging);
+							var newTabListB = weaveByDomain_v3(normalTabs,tabCnt,mergeArrays_depositPerBucketNeed_v3,mergeArrays_RoundRobin_rtl,debugging);
+							newTabList = roundRobinTwoWovenLists(newTabListA,newTabListB,debugging);
+						}
 						// = SharedWeaveFunc_v2(normalTabs,tabCnt,debugging);
 						
 						return browser.tabs.move(
@@ -190,6 +258,64 @@ function weaveByDomain(weaveMethod)
 								console.log(debugging);
 							return debugging;
 						}, onError);
+}
+
+/**
+ * This function takes two lists of tabs, and merges them in a round-robin fashion.
+ * The idea is to generate your woven set of tabs with two different methods, and then merge them together without duplicating tabs.
+ */
+function roundRobinTwoWovenLists(newTabListA,newTabListB,debugging)
+{
+	// merge the two lists.
+	var newTabList = [];
+	// we do this by keeping track of the tab.id used in each list, and *not* using tabs with that id from the other list.
+	var usedIDs = [];
+	var aptr = 0; 
+	var bptr = 0;
+	while(usedIDs.length < newTabListA.length)
+	{
+		var consumedA = false;
+		var consumedB = false;
+		
+		// loop through array A and find the first tab that hasn't been used
+		for(; aptr < newTabListA.length; aptr++)
+		{
+			// check that we haven't used this ID yet
+			if(debugging)debugging.push("for list A, checking if we have used tab ID '"+newTabListA[aptr].id+"'");
+			if(!usedIDs.includes(newTabListA[aptr].id))
+			{
+				if(debugging)debugging.push("we have not used tab ID '"+newTabListA[aptr].id+"', so we will add it to the new list");
+				// add this tab to the new list
+				newTabList.push(newTabListA[aptr]);
+				// add this tab's ID to the usedIDs list
+				usedIDs.push(newTabListA[aptr].id);
+				// we have consumed this tab.  Break out of the loop
+				consumedA = true;
+				// we'd consider incrementing the pointer, but we aren't sure if that will cause off-by-one errors, 
+				// and this process should be correct even if we started at 0 on every iteration.  Don't eagerly optimize.
+			}
+			if(consumedA)
+				break;
+		}
+		// loop through array B and find the first tab that hasn't been used
+		for(; bptr < newTabListB.length; bptr++)
+		{
+			if(debugging)debugging.push("for list B, checking if we have used tab ID '"+newTabListB[bptr].id+"'");
+			if(!usedIDs.includes(newTabListB[bptr].id))
+			{
+				if(debugging)debugging.push("we have not used tab ID '"+newTabListB[bptr].id+"', so we will add it to the new list");
+				newTabList.push(newTabListB[bptr]);
+				usedIDs.push(newTabListB[bptr].id);
+				consumedB = true;
+			}
+			if(consumedB)
+				break;
+		}
+		// zzapp -- error checking?  we should consume one tab from each list.  
+	}
+	// newTabList should now be the same size as newTabListA and newTabListB, 
+	// and contain all the distinct tabs from both lists.
+	return newTabList;
 }
 
 /*

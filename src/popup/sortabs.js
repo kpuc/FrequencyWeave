@@ -95,6 +95,42 @@ let menuDefs = [
 			16 : "icons/WeaveTabs-16.png"
 		}
 	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-basic-v3",
+		title : "RoundRobin Left to Right with FrequencyWeave v2",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-basic-v3-LeftTenPercent",
+		title : "RoundRobin ~10% Left to Right with FrequencyWeave v2",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-rtl-basic-v3",
+		title : "RoundRobin Right to Left with FrequencyWeave v2",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
+	,
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-rtl-basic-v3-LeftTenPercent",
+		title : "RoundRobin ~10% Right to Left with FrequencyWeave v2",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	}
 ];
 
 
