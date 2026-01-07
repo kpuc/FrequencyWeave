@@ -7,130 +7,143 @@
  */
 let menuDefs = [
 	{
-		id : "FrequencyWeave-by-domain",
-		title : "FrequencyWeave non-pinned tabs by domain for this window",
+		id : "Focus_Sqrt_Tab",
+		title : "Focus on sqrt non-pinned tab for this window",
 		contexts : ["tools_menu", "browser_action"],
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
-	}
-	,
-	{
-		id : "FrequencyWeave-by-domain-v1-LeftTenPercent",
-		title : "FrequencyWeave non-pinned leftmost ~10% tabs v1",
-		contexts : ["tools_menu", "browser_action"],
-		icons : {
-			16 : "icons/WeaveTabs-16.png"
-		}
-	}
-	,
+	},
+	
+	//{
+	//	id : "FrequencyWeave-by-domain",
+	//	title : "FrequencyWeave non-pinned tabs by domain for this window",
+	//	contexts : ["tools_menu", "browser_action"],
+	//	icons : {
+	//		16 : "icons/WeaveTabs-16.png"
+	//	}
+	//},
+	
+	//{
+	//	id : "FrequencyWeave-by-domain-v1-LeftTenPercent",
+	//	title : "FrequencyWeave non-pinned leftmost ~10% tabs v1",
+	//	contexts : ["tools_menu", "browser_action"],
+	//	icons : {
+	//		16 : "icons/WeaveTabs-16.png"
+	//	}
+	//},
+	
 	{
 		id : "FrequencyWeave-by-domain-v2",
-		title : "FrequencyWeave v2",
+		title : "FrequencyWeave",
 		contexts : ["tools_menu", "browser_action"],
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
-	}
-	,
-	{
-		id : "FrequencyWeave-by-domain-v2-LeftTenPercent",
-		title : "FrequencyWeave ~10% v2",
-		contexts : ["tools_menu", "browser_action"],
-		icons : {
-			16 : "icons/WeaveTabs-16.png"
-		}
-	}/*,
-	{
-		id : "FrequencyWeave-by-domain-v3",
-		title : "FrequencyWeave v3",
-		contexts : ["tools_menu", "browser_action"],
-		icons : {
-			16 : "icons/WeaveTabs-16.png"
-		}
-	}
-	,
-	{
-		id : "FrequencyWeave-by-domain-v3-LeftTenPercent",
-		title : "FrequencyWeave ~10% v3",
-		contexts : ["tools_menu", "browser_action"],
-		icons : {
-			16 : "icons/WeaveTabs-16.png"
-		}
-	}*/
+	},
 	
-	,
 	{
 		id : "FrequencyWeave-by-domain-RoundRobin-ltr",
-		title : "FrequencyWeave RoundRobin Left to Right",
+		title : "RoundRobin Left to Right",
 		contexts : ["tools_menu", "browser_action"],
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
-	}
-	,
-	{
-		id : "FrequencyWeave-by-domain-RoundRobin-ltr-LeftTenPercent",
-		title : "FrequencyWeave ~10% RoundRobin Left to Right",
-		contexts : ["tools_menu", "browser_action"],
-		icons : {
-			16 : "icons/WeaveTabs-16.png"
-		}
-	}
-	,
+	},
+	
 	{
 		id : "FrequencyWeave-by-domain-RoundRobin-rtl",
-		title : "FrequencyWeave RoundRobin Right to Left",
+		title : "RoundRobin Right to Left",
 		contexts : ["tools_menu", "browser_action"],
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
-	}
-	,
-	{
-		id : "FrequencyWeave-by-domain-RoundRobin-rtl-LeftTenPercent",
-		title : "FrequencyWeave ~10% RoundRobin Right to Left",
-		contexts : ["tools_menu", "browser_action"],
-		icons : {
-			16 : "icons/WeaveTabs-16.png"
-		}
-	}
-	,
+	},
+	
 	{
 		id : "FrequencyWeave-by-domain-RoundRobin-basic-v3",
-		title : "RoundRobin Left to Right with FrequencyWeave v2",
+		title : "RoundRobin Left to Right Every Other Tab FrequencyWeave",
 		contexts : ["tools_menu", "browser_action"],
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
-	}
-	,
-	{
-		id : "FrequencyWeave-by-domain-RoundRobin-basic-v3-LeftTenPercent",
-		title : "RoundRobin ~10% Left to Right with FrequencyWeave v2",
-		contexts : ["tools_menu", "browser_action"],
-		icons : {
-			16 : "icons/WeaveTabs-16.png"
-		}
-	}
-	,
+	},
+	
 	{
 		id : "FrequencyWeave-by-domain-RoundRobin-rtl-basic-v3",
-		title : "RoundRobin Right to Left with FrequencyWeave v2",
+		title : "RoundRobin Right to Left EOT FrequencyWeave",
 		contexts : ["tools_menu", "browser_action"],
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
-	}
-	,
+	},
+	
+	{
+		id : "FrequencyWeave-by-domain-v2-LeftTenPercent",
+		title : "~10% FrequencyWeave",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	},
+	
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-ltr-LeftTenPercent",
+		title : "~10% RoundRobin Left to Right",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	},
+	
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-rtl-LeftTenPercent",
+		title : "~10% RoundRobin Right to Left",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	},
+	
+	{
+		id : "FrequencyWeave-by-domain-RoundRobin-basic-v3-LeftTenPercent",
+		title : "~10% RoundRobin Left to Right EOT FrequencyWeave",
+		contexts : ["tools_menu", "browser_action"],
+		icons : {
+			16 : "icons/WeaveTabs-16.png"
+		}
+	},
+	
 	{
 		id : "FrequencyWeave-by-domain-RoundRobin-rtl-basic-v3-LeftTenPercent",
-		title : "RoundRobin ~10% Right to Left with FrequencyWeave v2",
+		title : "~10% RoundRobin Right to Left EOT FrequencyWeave",
 		contexts : ["tools_menu", "browser_action"],
 		icons : {
 			16 : "icons/WeaveTabs-16.png"
 		}
 	}
+	
+	//{
+	//	id : "FrequencyWeave-by-domain-v3",
+	//	title : "FrequencyWeave v3",
+	//	contexts : ["tools_menu", "browser_action"],
+	//	icons : {
+	//		16 : "icons/WeaveTabs-16.png"
+	//	}
+	//}
+	//,
+	//{
+	//	id : "FrequencyWeave-by-domain-v3-LeftTenPercent",
+	//	title : "FrequencyWeave ~10% v3",
+	//	contexts : ["tools_menu", "browser_action"],
+	//	icons : {
+	//		16 : "icons/WeaveTabs-16.png"
+	//	}
+	//}
+	//,
+	
+	
+	
 ];
 
 

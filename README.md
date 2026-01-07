@@ -30,6 +30,12 @@ Run `build.sh`, which uses `web-ext`.
 
 ## Changes
 
+### v0.12
+
+Removed v1 of the weave algo from the menu.
+Re-arranged the menu items, and slightly tweaked their wording.  The options to weave the leftmost ~10% of tabs have been grouped, plus other tweaks.
+Added a feature for bringing to focus the non-pinned tab approximately sqrt(tab_count) from the left of the current window.  This makes it easier to select the leftmost ~sqrt() tabs of a window for migration to another window.
+
 ### v0.11
 
 Added two new weaves.  We generate the basic weave and one of the round-robin weaves, and round-robin distinct tabs from both those results.

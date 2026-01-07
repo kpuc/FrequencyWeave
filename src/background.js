@@ -48,6 +48,16 @@ function sortTabsComparatorName(compName)
 {
 	switch (compName) 
 	{
+		/*
+		 * 2026-01-06
+		 * We are bad and are using sortTabsComparatorName to do more than weave tabs.
+		 * Today's task is adding a feature that selects a target tab to focus on.
+		 * Presently we are only planning on doing the Math.ceil(Math.sqrt(tabCount)) method.
+		 */
+		
+		case "Focus_Sqrt_Tab":
+			return focusSqrtTab();
+		
 		// we personally never use v1, so we may remove it in the future.
 		// We think v2 and v3 are essentially the same, but use two processes to generate similar results.
 		
@@ -103,6 +113,30 @@ function sortTabsComparatorName(compName)
 	// if we don't recognize the name, we return the default weaveByDomain method
 	return weaveByDomain();
 }
+
+/*
+ * Bring focus to the tab at index ceil(sqrt(tabCount))-1
+ */
+function focusSqrtTab()
+{
+	return browser.tabs.query(
+		{
+			pinned : false,
+			currentWindow : true
+		})
+		.then(
+			(tabs) =>
+			{
+				let tabCnt = tabs.length;
+				let targetIndex = Math.ceil(Math.sqrt(tabCnt)) - 1; // zero-based index
+				let targetTab = tabs[targetIndex];
+				return browser.tabs.update(
+					targetTab.id,
+					{ active : true }
+				);
+			}, onError);
+}
+
 
 
 function weaveByDomain(weaveMethod)
