@@ -20,12 +20,15 @@
 	"permissions" : [
 		  "tabs"
 	],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "FrequencyWeave@example.com"
-    }
-  },
-  "background": {
-    "scripts": ["background.js"]
-  }
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "FrequencyWeave@example.com",
+			"data_collection_permissions": {
+				"required": ["none"]
+			}
+		}
+	},
+	"background": {
+		"scripts": ["background.js"]
+	}
 }
